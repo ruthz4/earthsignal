@@ -1,0 +1,77 @@
+{
+  "variables": {
+    "DUEXTTAU": {
+      "long_name": "Dust AOD (550 nm)",
+      "units": "1"
+    },
+    "TOTEXTTAU": {
+      "long_name": "Total AOD (550 nm)",
+      "units": "1"
+    },
+    "DUSMASS": {
+      "long_name": "Dust surface mass concentration",
+      "units": "ug m-3"
+    },
+    "DUCMASS": {
+      "long_name": "Dust column mass density",
+      "units": "g m-2"
+    },
+    "DUFLUXU": {
+      "long_name": "Dust column zonal mass flux",
+      "units": "g m-1 s-1"
+    }
+  },
+  "seasons": [
+    "ANN",
+    "JJA",
+    "DJF"
+  ],
+  "start_years": [
+    1980,
+    2003
+  ],
+  "thresholds": [
+    2,
+    1
+  ],
+  "regions": {
+    "sahara_source": {
+      "name": "Saharan source region",
+      "bounds_S_N_W_E": [
+        15,
+        30,
+        -15,
+        30
+      ]
+    },
+    "sahel": {
+      "name": "Sahel",
+      "bounds_S_N_W_E": [
+        10,
+        18,
+        -18,
+        25
+      ]
+    },
+    "atlantic_corridor": {
+      "name": "Tropical Atlantic transport corridor",
+      "bounds_S_N_W_E": [
+        10,
+        25,
+        -50,
+        -20
+      ]
+    },
+    "caribbean": {
+      "name": "Caribbean",
+      "bounds_S_N_W_E": [
+        10,
+        25,
+        -90,
+        -60
+      ]
+    }
+  },
+  "observing_system_break": 2000,
+  "source": "NASA MERRA-2 M2TMNXAER v5.12.4 (GES DISC)"
+}
