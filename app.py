@@ -104,7 +104,7 @@ valid = np.isfinite(slope_f)
 proj_flag = np.zeros_like(valid)
 if layer == "Trend":
     val = slope_f; lim = np.nanpercentile(np.abs(val), 98) or 1
-    colors = dict(colorscale="RdBu_r", cmin=-lim, cmax=lim, colorbar=dict(title=f"{var_units[var]}<br>per decade"))
+    colors = dict(colorscale="RdBu_r", cmin=-lim, cmax=lim, colorbar=dict(orientation="h", x=0.5, xanchor="center", y=-0.02, yanchor="top", len=0.6, thickness=14, title_side="top", title=f"{var_units[var]}<br>per decade"))
     mask = valid
     hover = [f"{la:.1f}°N {lo:.1f}°E<br>trend {v:.3g}/decade<br>p = {p:.3f}, q = {q:.3f}"
              for la, lo, v, p, q in zip(LAT[mask], LON[mask], val[mask], pval[mask], qval[mask])]
@@ -119,7 +119,7 @@ else:
     if only_sig:
         val = np.where(qval < 0.05, val, np.nan)
     val = np.where(val <= asof, val, np.nan)
-    colors = dict(colorscale=[[0, "#7A4A12"], [0.45, "#E39B2D"], [1, "#FFF1A8"]], cmin=start + 10, cmax=cmax, colorbar=dict(title="ToE year", tickvals=sorted(set(list(range(int(np.ceil((start + 10) / 5) * 5), cmax + 1, 5 if cmax <= end_year else 10)) + [cmax]))))
+    colors = dict(colorscale=[[0, "#5B2C06"], [0.4, "#C8650E"], [0.75, "#F2A51A"], [1, "#FFD43B"]], cmin=start + 10, cmax=cmax, colorbar=dict(orientation="h", x=0.5, xanchor="center", y=-0.02, yanchor="top", len=0.6, thickness=14, title_side="top", title="Time of Emergence (year)", tickvals=[t for t in range(int(np.ceil((start + 10) / 5) * 5), cmax + 1, 5 if cmax <= end_year else 10) if cmax - t >= 2] + [cmax]))
     mask = np.isfinite(val)
     hover = [f"{la:.1f}°N {lo:.1f}°E<br>{'conditional projection' if pf else 'emerged'} {int(v)}<br>p = {p:.3f}, q = {q:.3f}"
              for la, lo, v, p, q, pf in zip(LAT[mask], LON[mask], val[mask], pval[mask], qval[mask], proj_flag[mask])]
@@ -130,12 +130,12 @@ if layer != "Trend":
     ns = (nm & (qval >= 0.05)) if only_sig else np.zeros_like(nm)
     ny = nm & ~ns
     fig.add_trace(go.Scattergeo(lon=LON[ns], lat=LAT[ns], mode="markers", name="Trend not significant (FDR q ≥ 0.05)",
-                                marker=dict(size=5, symbol="square", color="#eceef1"), hoverinfo="skip"))
+                                marker=dict(size=6, symbol="square", color="#cfd5dd"), hoverinfo="skip"))
     fig.add_trace(go.Scattergeo(lon=LON[ny], lat=LAT[ny], mode="markers",
                                 name=(f"Significant trend, not emerged by {asof}" if only_sig else f"Not emerged by {asof}"),
-                                marker=dict(size=5, symbol="square", color="#aab6c6"), hoverinfo="skip"))
+                                marker=dict(size=6, symbol="square", color="#7f8ea3"), hoverinfo="skip"))
 fig.add_trace(go.Scattergeo(lon=LON[mask], lat=LAT[mask], mode="markers", showlegend=False,
-                            marker=dict(size=5, symbol="square", color=val[mask], **colors), text=hover, hoverinfo="text"))
+                            marker=dict(size=6, symbol="square", color=val[mask], **colors), text=hover, hoverinfo="text"))
 if layer == "Projected ToE":
     pm = mask & proj_flag
     fig.add_trace(go.Scattergeo(lon=LON[pm][::2], lat=LAT[pm][::2], mode="markers", name=f"Conditional projection (after {end_year})",
@@ -154,7 +154,7 @@ else:
 fig.update_geos(lataxis_range=[0, 40], lonaxis_range=[-100, 40], showcoastlines=True, coastlinecolor="#444",
                 showland=True, landcolor="#f4f1ea", showocean=True, oceancolor="#dcEEF8",
                 projection_type="equirectangular", fitbounds="locations")
-fig.update_layout(height=480, margin=dict(l=0, r=0, t=10, b=0), legend=dict(orientation="h", y=-0.05))
+fig.update_layout(height=560, margin=dict(l=0, r=0, t=40, b=70), legend=dict(orientation="h", x=0, y=1.0, yanchor="bottom", itemsizing="constant", font=dict(size=13)))
 st.plotly_chart(fig, width="stretch")
 if layer == "Projected ToE":
     st.caption(f"Cells after {end_year} (marked with dots) are **conditional projections, not forecasts**: shown only where the trend passes FDR (q < 0.05), "
