@@ -94,6 +94,44 @@ with hc1:
 with hc2:
     if os.path.exists("mascot.svg"):
         st.html('<div style="display:flex;justify-content:center">' + open("mascot.svg").read() + '</div>')
+with st.expander("🌍 Before you explore: Why does dust matter?", expanded=False):
+    st.markdown("""
+Every year, winds carry Saharan dust thousands of kilometers across the Atlantic, sometimes reaching the Caribbean and the Amazon. Along the way, dust affects air quality, ecosystems, and even how sunlight interacts with the atmosphere.
+
+But here's something we find fascinating: **dust doesn't behave the same way every year.**
+
+Some years are much dustier than others. So when we see dust gradually increasing or decreasing over decades, how can we tell whether it's a long-term change or just the usual ups and downs?
+
+That's the question behind **EarthSignal**.
+
+### When does a change become detectable?
+
+Imagine trying to hear someone speaking in a noisy room. At first, their voice gets lost in the background. But as it grows louder, you can finally distinguish it from the noise.
+
+Scientists call a related concept **Time of Emergence (ToE)**.
+
+EarthSignal estimates when a long-term change in dust becomes large enough to stand out from natural year-to-year variability, and remains above that threshold through the end of the record.
+
+Because we look back at the full record, the estimated emergence year is not necessarily the year scientists could have detected the change in real time.
+
+### Try exploring
+
+1. **Start in the Sahara.** Select *Annual mean*, *2003*, and *Saharan source region*. Our analysis estimates that a declining dust signal emerged around 2019.
+2. **Follow the dust.** Switch to the *Caribbean*. Is the change equally detectable farther from the source?
+3. **Change the starting year.** Compare *1980* and *2003*. Notice how the results change when you use a different observation period.
+
+### Reading the map
+
+- **Brown → yellow:** Earlier to more recent estimated emergence years.
+- **Dark gray:** Significant trend, but no detected emergence.
+- **Light gray:** No significant trend.
+- Use the **Emerged by year** slider to explore retrospectively estimated emergence years.
+
+**A few terms:** *AOD (aerosol optical depth)* measures how much sunlight is blocked by particles in the air; higher means dustier. *FDR* is a correction that avoids false alarms when thousands of map cells are tested at once. *k* is how many times larger than normal year-to-year variability a change must be to count as emerged (our main results use k = 2).
+
+**One thing to remember:** not detecting a change doesn't mean nothing is changing. Sometimes the signal is simply too small compared with the background variability to distinguish confidently.
+""")
+
 st.markdown(f"**{VAR_LABELS.get(var, var)}**, {SEASON_LABELS[season]}, from **{start}** to {end_year} · NASA MERRA-2 reanalysis (M2TMNXAER), 0–40°N, 100°W–40°E")
 
 step = 2
