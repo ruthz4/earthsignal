@@ -14,7 +14,7 @@ VAR_LABELS = {"DUEXTTAU": "Dust AOD (550 nm)", "TOTEXTTAU": "Total AOD (550 nm)"
               "DUSMASS": "Dust surface concentration", "DUCMASS": "Dust column mass",
               "DUFLUXU": "Dust zonal flux (negative = westward)"}
 SEASON_LABELS = {"JJA": "Summer (JJA)", "DJF": "Winter (DJF)", "ANN": "Annual mean"}
-START_LABELS = {1980: "1980 (full record)", 2003: "2003 (consistent satellite era)"}
+START_LABELS = {1980: "1980 (full record)", 2003: "2003 (modern satellite era)"}
 BREAK_YEAR, HORIZON = 2000, 2100
 
 @st.cache_data
@@ -36,6 +36,12 @@ def projected_toe(start, slope_per_decade, noise, k):
     b = np.abs(np.asarray(slope_per_decade, dtype=float)) / 10.0
     with np.errstate(divide="ignore", invalid="ignore"):
         return start + k * np.asarray(noise, dtype=float) / b
+
+def toe_ticks(cmin, cmax):
+    span = cmax - cmin
+    step = 2 if span <= 15 else (5 if span <= 40 else 10)
+    mid = [t for t in range(int(np.ceil(cmin / step) * step), cmax + 1, step) if t - cmin >= 0.6 * step and cmax - t >= 0.6 * step]
+    return [cmin] + mid + [cmax]
 
 def series_stats(years, y, k_list=(1, 2), min_years=10):
     t = years.astype(float); n = len(t); i, j = np.triu_indices(n, k=1)
@@ -66,9 +72,9 @@ var_units = {v: (meta["variables"][v]["units"] if meta["variables"][v]["units"] 
 st.sidebar.title("EarthSignal")
 st.sidebar.caption("When does Saharan dust change become detectable?")
 var = st.sidebar.selectbox("Variable", list(meta["variables"]), format_func=lambda v: VAR_LABELS.get(v, v))
-season = st.sidebar.radio("Season", ["JJA", "DJF", "ANN"], format_func=lambda s: SEASON_LABELS[s])
-start = st.sidebar.radio("Analysis start year", meta["start_years"], format_func=lambda s: START_LABELS.get(s, str(s)),
-    help="MERRA-2 starts in 1980, but began assimilating MODIS aerosol observations in 2000 (Terra) and 2002 (Aqua). 2003 is the first full year with a consistent satellite observing system.")
+season = st.sidebar.radio("Season", ["JJA", "DJF", "ANN"], index=2, format_func=lambda s: SEASON_LABELS[s])
+start = st.sidebar.radio("Analysis start year", meta["start_years"], index=len(meta["start_years"]) - 1, format_func=lambda s: START_LABELS.get(s, str(s)),
+    help="MERRA-2 starts in 1980, but began assimilating MODIS aerosol observations in 2000 (Terra) and 2002 (Aqua). 2003 is the first full year after both MODIS sensors were assimilated. The observing system keeps evolving afterwards, but the largest change is avoided.")
 layer = st.sidebar.radio("Map layer", ["Estimated ToE", "Projected ToE", "Trend"])
 k = st.sidebar.radio("Signal-to-noise threshold (k)", sorted(meta["thresholds"], reverse=True), horizontal=True,
     format_func=lambda x: f"{x} (main)" if x == 2 else f"{x} (exploratory)",
@@ -157,7 +163,7 @@ else:
     if only_sig:
         val = np.where(qval < 0.05, val, np.nan)
     val = np.where(val <= asof, val, np.nan)
-    colors = dict(colorscale=[[0, "#5B2C06"], [0.4, "#C8650E"], [0.75, "#F2A51A"], [1, "#FFD43B"]], cmin=start + 10, cmax=cmax, colorbar=dict(orientation="h", x=0.5, xanchor="center", y=-0.02, yanchor="top", len=0.6, thickness=14, title_side="top", title="Time of Emergence (year)", tickvals=[t for t in range(int(np.ceil((start + 10) / 5) * 5), cmax + 1, 5 if cmax <= end_year else 10) if cmax - t >= 2] + [cmax]))
+    colors = dict(colorscale=[[0, "#5B2C06"], [0.4, "#C8650E"], [0.75, "#F2A51A"], [1, "#FFD43B"]], cmin=start + 10, cmax=cmax, colorbar=dict(orientation="h", x=0.5, xanchor="center", y=-0.02, yanchor="top", len=0.6, thickness=14, title_side="top", title="Time of Emergence (year)", tickvals=toe_ticks(start + 10, int(cmax))))
     mask = np.isfinite(val)
     hover = [f"{la:.1f}°N {lo:.1f}°E<br>{'conditional projection' if pf else 'emerged'} {int(v)}<br>p = {p:.3f}, q = {q:.3f}"
              for la, lo, v, p, q, pf in zip(LAT[mask], LON[mask], val[mask], pval[mask], qval[mask], proj_flag[mask])]
