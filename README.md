@@ -4,7 +4,7 @@
 
 > A trend can be real long before it becomes detectable. EarthSignal shows when and where changes in Saharan dust rise above natural variability.
 
-**Live app:** [YOUR_STREAMLIT_LINK](YOUR_STREAMLIT_LINK)
+**Live app:** https://earthsignal-dust1234.streamlit.app/
 
 ## Research question
 
